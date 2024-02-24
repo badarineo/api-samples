@@ -36,7 +36,7 @@ API_VERSION = 'v3'
 # Authorize the request and store authorization credentials.
 def get_authenticated_service():
   flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-  credentials = flow.run_console()
+  credentials = flow.run_local_server(redirect_uri_trailing_slash=False)
   return build(API_SERVICE_NAME, API_VERSION, credentials = credentials)
 
 def get_my_uploads_list():
@@ -62,7 +62,7 @@ def list_my_uploaded_videos(uploads_playlist_id):
     maxResults=5
   )
 
-  print 'Videos in list %s' % uploads_playlist_id
+  print ('Videos in list ', uploads_playlist_id)
   while playlistitems_list_request:
     playlistitems_list_response = playlistitems_list_request.execute()
 
@@ -70,7 +70,7 @@ def list_my_uploaded_videos(uploads_playlist_id):
     for playlist_item in playlistitems_list_response['items']:
       title = playlist_item['snippet']['title']
       video_id = playlist_item['snippet']['resourceId']['videoId']
-      print '%s (%s)' % (title, video_id)
+      print (title, "(",video_id,")")
 
     playlistitems_list_request = youtube.playlistItems().list_next(
       playlistitems_list_request, playlistitems_list_response)
@@ -83,5 +83,5 @@ if __name__ == '__main__':
       list_my_uploaded_videos(uploads_playlist_id)
     else:
       print('There is no uploaded videos playlist for this user.')
-  except HttpError, e:
-    print 'An HTTP error %d occurred:\n%s' % (e.resp.status, e.content)
+  except HttpError as e:
+    print ("An HTTP error",e.resp.status," occurred:",e.content,"\n")
